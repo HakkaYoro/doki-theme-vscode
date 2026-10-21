@@ -60,10 +60,16 @@ export const watchConfigChanges = (
     const isWallPaperFullPath = isFile(wallpaperConfig);
     const anchorChanged = newBoiConfig.get(CONFIG_BACKGROUND_ANCHOR) !==
       currentConfig.get(CONFIG_BACKGROUND_ANCHOR);
+    const wallpaperEnabledChanged = newBoiConfig.get(CONFIG_WALLPAPER_ENABLED) !==
+      currentConfig.get(CONFIG_WALLPAPER_ENABLED);
+    const backgroundEnabledChanged = newBoiConfig.get(CONFIG_BACKGROUND_ENABLED) !==
+      currentConfig.get(CONFIG_BACKGROUND_ENABLED);
     const wallpaperInstall =
       (backgroundChanged && (isBackgroundFullPath || !backgroundConfig)) ||
         (wallpaperChanged && (isWallPaperFullPath || !wallpaperConfig)) ||
-        anchorChanged ?
+        anchorChanged ||
+        wallpaperEnabledChanged ||
+        backgroundEnabledChanged ?
         attemptToInstallWallpaper({
           theme,
           sticker: sticker.sticker,

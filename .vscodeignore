@@ -22,3 +22,7 @@ screenshots/**
 *_themes.md
 *.sh
 readmeStuff/
+
+.tooling/**
+.zcode/**
+masterThemes/**

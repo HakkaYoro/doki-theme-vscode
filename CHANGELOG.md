@@ -1,5 +1,12 @@
 # Change Log
 
+## 88.2.0 [Bug Fixes]
+
+- Fixed the editor background transparency on modern VS Code builds (1.100+). The editor root element now paints the theme background color, which buried the background image layers. Please re-install your wallpaper (or run `Doki Theme: Restore Assets`) for this to take effect.
+- Fixed the breadcrumbs bar not matching the wallpaper (it now receives the same background treatment as the tabs).
+- Fixed custom assets getting stuck in a partially installed state when sticker and wallpaper installs ran concurrently (a "Background Image" or "Stickers" block could go missing and stop restoring). Installs are now serialized, and toggling `doki.wallpaper.enabled` / `doki.background.enabled` properly re-applies the assets.
+- A custom wallpaper now also replaces the empty-editor background image, so the two layers no longer show different artwork on top of each other.
+
 ## 88.5-1.6.4 [Bug Fixes]
 
 - Restored the ability for the extension to load. Restore your assets, exit VSCode and start it again for this to take effect. 

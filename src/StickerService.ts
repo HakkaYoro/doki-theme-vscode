@@ -34,7 +34,8 @@ function buildWallpaperCss({
   backgroundAnchoring,
 }: DokiStickers): string {
   return `${wallpaperComment}
-  [id="workbench.parts.editor"] .split-view-view .editor-container .editor-instance>.monaco-editor .overflow-guard>.monaco-scrollable-element>.monaco-editor-background{background: none;}
+  [id="workbench.parts.editor"] .monaco-editor,
+  [id="workbench.parts.editor"] .monaco-editor-background { background: none !important; }
 
 
   [id="workbench.parts.editor"] .split-view-view .editor-container .editor-instance>.monaco-editor  .overflow-guard>.monaco-scrollable-element::before,
@@ -62,6 +63,8 @@ function buildWallpaperCss({
   .minimap-decorations-layer,
   .xterm-cursor-layer,
   .monaco-breadcrumbs,
+  .breadcrumbs-control,
+  .breadcrumbs-editor-type,
   /* sticky lines */
   .monaco-editor .sticky-line-content,
   .monaco-editor .sticky-line-number,
@@ -103,7 +106,9 @@ function buildWallpaperCss({
     backdrop-filter: blur(5px) !important;
   }
 
-  .monaco-breadcrumbs {
+  .monaco-breadcrumbs,
+  .breadcrumbs-control,
+  .breadcrumbs-editor-type {
     background-color: #00000000 !important;
   }
 
@@ -226,6 +231,16 @@ function installEditorStyles(styles: string) {
   fs.writeFileSync(editorCss, styles, "utf-8");
 }
 
+// Every install rewrites the whole workbench stylesheet from a snapshot taken
+// before its (awaitable) asset downloads. Concurrent installs must therefore
+// run one at a time, or the last writer drops the other's CSS block.
+let installQueue: Promise<unknown> = Promise.resolve();
+function enqueueInstall<T>(job: () => Promise<T>): Promise<T> {
+  const scheduled = installQueue.then(job);
+  installQueue = scheduled.catch(() => undefined);
+  return scheduled;
+}
+
 function canWrite(): boolean {
   try {
     fs.accessSync(editorCss, fs.constants.W_OK);
@@ -246,8 +261,10 @@ export async function installStickers(
   stickerInstallPayload: StickerInstallPayload,
   context: vscode.ExtensionContext
 ): Promise<InstallStatus> {
-  return installStyles(stickerInstallPayload, context, (stickersAndWallpaper) =>
-    buildCSSWithStickers(stickersAndWallpaper)
+  return enqueueInstall(() =>
+    installStyles(stickerInstallPayload, context, (stickersAndWallpaper) =>
+      buildCSSWithStickers(stickersAndWallpaper)
+    )
   );
 }
 
@@ -255,16 +272,20 @@ export async function installWallPaper(
   stickerInstallPayload: StickerInstallPayload,
   context: vscode.ExtensionContext
 ): Promise<InstallStatus> {
-  return installStyles(stickerInstallPayload, context, (stickersAndWallpaper) =>
-    buildCSSWithWallpaperAndBackground(stickersAndWallpaper)
+  return enqueueInstall(() =>
+    installStyles(stickerInstallPayload, context, (stickersAndWallpaper) =>
+      buildCSSWithWallpaperAndBackground(stickersAndWallpaper)
+    )
   );
 }
 
 export async function hideWaterMark(): Promise<InstallStatus> {
-  if (!canWrite()) return InstallStatus.FAILURE;
+  return enqueueInstall(async () => {
+    if (!canWrite()) return InstallStatus.FAILURE;
 
-  installEditorStyles(buildCSSWithoutWatermark())
-  return InstallStatus.INSTALLED
+    installEditorStyles(buildCSSWithoutWatermark())
+    return InstallStatus.INSTALLED
+  });
 }
 
 

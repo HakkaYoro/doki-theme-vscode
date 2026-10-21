@@ -80,7 +80,8 @@ const _attemptToUpdateSticker = async (
       fs.existsSync(customSticker) ? customSticker : localStickerPath
     ),
     backgroundImageURL: createCssDokiAssetUrl(
-      fs.existsSync(customBackground) ? customBackground : localBackgroundPath
+      fs.existsSync(customBackground) ? customBackground :
+        fs.existsSync(customWallpaper) ? customWallpaper : localBackgroundPath
     ),
     wallpaperImageURL: createCssDokiAssetUrl(
       fs.existsSync(customWallpaper) ? customWallpaper : localWallpaperPath
