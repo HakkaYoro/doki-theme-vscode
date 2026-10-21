@@ -40,12 +40,12 @@ function buildWallpaperCss({
 
   [id="workbench.parts.editor"] .split-view-view .editor-container .editor-instance>.monaco-editor  .overflow-guard>.monaco-scrollable-element::before,
   .overflow-guard,
-  .tab,
+  .monaco-workbench .part.titlebar,
   /* settings UI */
   .settings-editor>.settings-body .settings-toc-container,
   /* end settings UI */
-  .tabs-container,
-  .monaco-pane-view, 
+  .tabs-and-actions-container,
+  .monaco-pane-view,
   .composite.title,
   /* welcome window */
   .editor-container,
@@ -110,6 +110,14 @@ function buildWallpaperCss({
   .breadcrumbs-control,
   .breadcrumbs-editor-type {
     background-color: #00000000 !important;
+  }
+
+  /* The tab strip scrolls, and scrolled containers do not render fixed
+     background images, so the strip stays clear and the wallpaper is
+     painted by its non-scrolling ancestors. */
+  .tabs-container,
+  .tab {
+    background-color: transparent !important;
   }
 
   [id="workbench.view.explorer"] .monaco-list-rows,

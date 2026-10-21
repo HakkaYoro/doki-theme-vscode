@@ -1,5 +1,10 @@
 # Change Log
 
+## 88.2.1 [Bug Fixes]
+
+- Fixed the wallpaper disappearing behind the editor tabs whenever the tab strip was scrolled (scrolled containers do not render fixed background images). The strip is now painted by its non-scrolling ancestors, so the artwork stays put regardless of scroll position.
+- The title bar now shows the wallpaper as well, instead of a solid strip.
+
 ## 88.2.0 [Bug Fixes]
 
 - Fixed the editor background transparency on modern VS Code builds (1.100+). The editor root element now paints the theme background color, which buried the background image layers. Please re-install your wallpaper (or run `Doki Theme: Restore Assets`) for this to take effect.
